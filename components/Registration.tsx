@@ -8,8 +8,8 @@ const regsitrationSchema = z.object({
   firstname: z.string().min(1, "Required"),
   lastname: z.string().min(1, "Required"),
   email: z.string().email("Invalid email format"),
-  password: z.string(),
-  confirmPassword: z.string(),
+  password: z.string().min(1, "Required"),
+  confirmPassword: z.string().min(1, "Required"),
 });
 type RegistrationValues = z.infer<typeof regsitrationSchema>;
 const Registration = () => {
