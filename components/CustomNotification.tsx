@@ -1,6 +1,5 @@
 "use client";
 import { Snackbar, Alert } from "@mui/material";
-import { useState } from "react";
 
 type CustomNotificationProps = {
   open: boolean;
