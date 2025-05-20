@@ -3,7 +3,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { SessionProvider } from "next-auth/react";
 import { auth } from "@/auth";
-import { SessionWrapper } from "@/hooks/providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,7 +30,7 @@ const session = await auth();
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <SessionWrapper session={session}>{children}</SessionWrapper>
+        <SessionProvider session={session}>{children}</SessionProvider>
       </body>
     </html>
   );
