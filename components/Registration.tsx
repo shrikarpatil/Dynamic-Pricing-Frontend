@@ -1,23 +1,13 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button, TextField } from "@mui/material";
+import { Button } from "@mui/material";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { z } from "zod";
 import CustomInput from "./FormInputs/CustomInput";
-import { USER_API } from "@/config/api-endpoints";
 import { useState } from "react";
 import CustomNotification from "./CustomNotification";
-import { createData } from "../actions/server-actions/proxy-fetcher";
-import { ProxyResponse } from "@/actions/server-actions/proxy-contracts";
+import { RegisterNewUser } from "@/actions/registration";
+import { RegistrationValues, regsitrationSchema } from "@/app/api/lib/types";
 
-const regsitrationSchema = z.object({
-  firstname: z.string().min(1, "Required"),
-  lastname: z.string().min(1, "Required"),
-  email: z.string().email("Invalid email format"),
-  password: z.string().min(1, "Required"),
-  confirmPassword: z.string().min(1, "Required"),
-});
-type RegistrationValues = z.infer<typeof regsitrationSchema>;
 const Registration = () => {
   const [nopen, setNopen] = useState(false);
   const [notification, setNotification] = useState({
@@ -30,19 +20,35 @@ const Registration = () => {
   });
   const onSubmit: SubmitHandler<RegistrationValues> = async (data) => {
     try {
-      console.log(data);
-      const response: any = await createData(USER_API, data);
-      console.log(response);
-      if (response.status === 200) {
+      if (data.password === data.confirmPassword) {
+        const response = await RegisterNewUser(data);
+        console.log(response);
+             if (response?.status === 200) {
+               setNotification({
+                 message: "Registration Successful",
+                 variant: "outlined",
+                 severity: "success",
+               });
+               setNopen(true);
+             } else if (response?.status === 409) {
+              setNotification({
+                message: "User Already Exists.",
+                variant: "outlined",
+                severity: "info",
+              });
+              setNopen(true);
+             }
+             else {
+               setNotification({
+                 message: "Registration Failed",
+                 variant: "outlined",
+                 severity: "error",
+               });
+               setNopen(true);
+             }
+      }  else {
         setNotification({
-          message: "Registration Successful",
-          variant: "outlined",
-          severity: "success",
-        });
-        setNopen(true);
-      } else {
-        setNotification({
-          message: "Registration Failed",
+          message: "Passwords don't match.",
           variant: "outlined",
           severity: "error",
         });
@@ -51,7 +57,7 @@ const Registration = () => {
     } catch (error) {
       console.log(error);
       setNotification({
-        message: "An error occured",
+        message: "Registration failed",
         variant: "outlined",
         severity: "error",
       });
@@ -59,8 +65,8 @@ const Registration = () => {
     }
   };
   return (
-    <div className="flex h-screen justify-center items-center">
-      <div className="w-1/3 rounded-lg shadow-2xl">
+    <div className="flex h-screen justify-center items-center bg-slate-100">
+      <div className="lg:w-1/3 rounded-lg shadow-2xl">
         <h2 className="text-xl font-bold text-center text-slate-700">
           Registration Form
         </h2>

@@ -1,4 +1,5 @@
-import { TextField} from "@mui/material";
+"use client";
+import { TextField } from "@mui/material";
 import { Controller } from "react-hook-form";
 
 type CustomInputProps = {
