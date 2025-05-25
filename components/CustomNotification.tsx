@@ -1,34 +1,43 @@
 "use client";
+
+import { NotificationType } from "@/app/api/lib/types";
 import { Snackbar, Alert } from "@mui/material";
+import { useEffect, useState } from "react";
 
-type CustomNotificationProps = {
-  open: boolean;
-  onClose: () => void;
-  message: string;
-  variant: "standard" | "outlined" | "filled";
-  severity: "success" | "error" | "warning" | "info";
-};
+const CustomNotification = ({
+  message,
+  variant,
+  severity,
+}: NotificationType) => {
+  const [open, setOpen] = useState(false);
 
-const CustomNotification = ({message , variant,severity,open,onClose}:CustomNotificationProps) => {   
+  useEffect(() => {
+    if (message) {
+      setOpen(true);
+    }
+  }, [message]);
 
-    return (           
-        <Snackbar
-        open={open}
-        autoHideDuration={5000}
-        onClose={onClose}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  return (
+    <Snackbar
+      open={open}
+      autoHideDuration={3000}
+      onClose={handleClose}
+      anchorOrigin={{ vertical: "top", horizontal: "center" }}
+    >
+      <Alert
+        onClose={handleClose}
+        severity={severity}
+        variant={variant}
+        sx={{ width: "100%" }}
       >
-        <Alert
-          onClose={onClose}
-          severity={severity}
-          variant={variant}
-          sx={{ width: "100%" }}
-        >
-         {message}
-        </Alert>
-      </Snackbar>
-        
-    );
-}
+        {message}
+      </Alert>
+    </Snackbar>
+  );
+};
 
 export default CustomNotification;

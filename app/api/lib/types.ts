@@ -15,3 +15,9 @@ export const signinSchema = z.object({
 });
 
 export type signinForm = z.infer<typeof signinSchema>;
+
+export type NotificationType = {
+  message: string;
+  variant: "standard" | "outlined" | "filled";
+  severity: "success" | "error" | "warning" | "info";
+};

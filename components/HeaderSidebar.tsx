@@ -7,11 +7,12 @@ import { Drawer } from "@mui/material";
 import { useState } from "react";
 import { DASHBOARD_PAGE, SIGNIN_PAGE } from "@/config/constants";
 import { useRouter } from "next/navigation";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 
 const HeaderSidebar = () => {
   const [sidebar, setSidebar] = useState<boolean>(false);
-  const router = useRouter();  
+  const router = useRouter();
+  const session = useSession();
   const drawerList = [
     {
       key: 0,
@@ -31,9 +32,8 @@ const HeaderSidebar = () => {
           <ExitToAppIcon fontSize="small" />
         </p>
       ),
-      onClickAction: async() => {
-        await signOut({callbackUrl:SIGNIN_PAGE}); 
-        
+      onClickAction: async () => {
+        await signOut({ callbackUrl: SIGNIN_PAGE });
       },
     },
   ];
@@ -50,6 +50,11 @@ const HeaderSidebar = () => {
         </div>
         <p className="text-slate-400">
           {" "}
+          <span className="text-slate-800">
+            {" "}
+            {` ${session?.data?.user?.firstname}
+          ${session?.data?.user?.lastname}`}
+          </span>
           <AccountCircleRoundedIcon fontSize="large" className="mx-2" />
         </p>
       </div>
@@ -67,16 +72,18 @@ const HeaderSidebar = () => {
           <h2 className="text-xl font-bold text-center text-blue-900 my-6 italic">
             Dynamic Pricing Engine
           </h2>
-          <hr className="text-slate-400 mx-6 mb-2"/>
+          <hr className="text-slate-400 mx-6 mb-2" />
         </div>
         {drawerList.map((item: any) => {
           return (
-           
-              <div className="flex gap-2 text-left rounded-lg cursor-default p-2 mx-4 hover:bg-slate-200"  key={item.key} onClick={item.onClickAction}>
-                {item.icon}
-                {item.label}
-              </div>
-            
+            <div
+              className="flex gap-2 text-left rounded-lg cursor-default p-2 mx-4 hover:bg-slate-200"
+              key={item.key}
+              onClick={item.onClickAction}
+            >
+              {item.icon}
+              {item.label}
+            </div>
           );
         })}
       </Drawer>

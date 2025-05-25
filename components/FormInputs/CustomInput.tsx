@@ -5,7 +5,7 @@ import { Controller } from "react-hook-form";
 type CustomInputProps = {
   name: string;
   control: any;
-  label: string; 
+  label: any; 
   [x: string]: any;
 };
 
