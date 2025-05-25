@@ -3,65 +3,64 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@mui/material";
 import { SubmitHandler, useForm } from "react-hook-form";
 import CustomInput from "./FormInputs/CustomInput";
-import { useState } from "react";
-import CustomNotification from "./CustomNotification";
+import { useEffect, useState } from "react";
 import { RegisterNewUser } from "@/actions/registration";
 import { RegistrationValues, regsitrationSchema } from "@/app/api/lib/types";
+import { useLoading } from "@/hooks/context/LoadingContext";
+import { useNotification } from "@/hooks/context/NotificationContext";
 
 const Registration = () => {
-  const [nopen, setNopen] = useState(false);
-  const [notification, setNotification] = useState({
-    message: "",
-    variant: "outlined" as "standard" | "outlined" | "filled",
-    severity: "success" as "success" | "error" | "warning" | "info",
-  });
+  const { setLoading: setModalLoading } = useLoading();
+  useEffect(() => {
+    setModalLoading(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[]);
+
+  const { setNotificationData: notification } = useNotification();
   const { handleSubmit, control } = useForm<RegistrationValues>({
     resolver: zodResolver(regsitrationSchema),
   });
   const onSubmit: SubmitHandler<RegistrationValues> = async (data) => {
     try {
+      setModalLoading(true);
       if (data.password === data.confirmPassword) {
         const response = await RegisterNewUser(data);
         console.log(response);
-             if (response?.status === 200) {
-               setNotification({
-                 message: "Registration Successful",
-                 variant: "outlined",
-                 severity: "success",
-               });
-               setNopen(true);
-             } else if (response?.status === 409) {
-              setNotification({
-                message: "User Already Exists.",
-                variant: "outlined",
-                severity: "info",
-              });
-              setNopen(true);
-             }
-             else {
-               setNotification({
-                 message: "Registration Failed",
-                 variant: "outlined",
-                 severity: "error",
-               });
-               setNopen(true);
-             }
-      }  else {
-        setNotification({
+        if (response?.status === 200) {
+          notification({
+            message: "Registration Successful",
+            variant: "outlined",
+            severity: "success",
+          });
+        } else if (response?.status === 409) {
+          notification({
+            message: "User Already Exists.",
+            variant: "outlined",
+            severity: "info",
+          });
+        } else {
+          notification({
+            message: "Registration Failed",
+            variant: "outlined",
+            severity: "error",
+          });
+        }
+      } else {
+        notification({
           message: "Passwords don't match.",
           variant: "outlined",
           severity: "error",
         });
-        setNopen(true);
       }
     } catch (error) {
       console.log(error);
-      setNotification({
+      notification({
         message: "Registration failed",
         variant: "outlined",
         severity: "error",
       });
-      setNopen(true);
+    } finally {
+      setModalLoading(false);
     }
   };
   return (
@@ -113,11 +112,6 @@ const Registration = () => {
           </div>
         </form>
       </div>
-      <CustomNotification
-        open={nopen}
-        onClose={() => setNopen(false)}
-        {...notification}
-      />
     </div>
   );
 };
